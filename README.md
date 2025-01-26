@@ -1,0 +1,1 @@
+# Automates-CI-CD-Pipeline-for-Kubernetes-with-HPA-Ingress-and-Monitoring
