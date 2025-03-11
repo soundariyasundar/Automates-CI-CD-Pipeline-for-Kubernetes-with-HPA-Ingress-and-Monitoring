@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: busapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: busapp
+  template:
+    metadata:
+      labels:
+        app: busapp
+    spec:
+      containers:
+        - name: busapp
+          image: learnitguide/busapp
+          ports:
+            - containerPort: 8080
