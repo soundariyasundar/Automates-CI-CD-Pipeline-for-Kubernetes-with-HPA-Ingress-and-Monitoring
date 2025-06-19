@@ -1,24 +1,100 @@
 pipeline {
     agent any
+
+    environment {
+        KUBECONFIG = credentials('eks-kubeconfig') 
+    }
+
     stages {
-        stage('Pull Docker Image') {
+        stage('Checkout Code') {
             steps {
-                sh 'docker pull learnitguide/busapp'
+                git 'https://github.com/soundariyasundar/Automates-CI-CD-Pipeline-for-Kubernetes-with-HPA-Ingress-and-Monitoring' 
             }
         }
-        stage('Deploy to Kubernetes') {
+
+        stage('Apply Kubernetes YAMLs') {
             steps {
-                sh 'kubectl apply -f deployment.yaml'
-                sh 'kubectl apply -f service.yaml'
-                sh 'kubectl apply -f ingress.yaml'
-                sh 'kubectl apply -f hpa.yaml'
+                sh '''
+                kubectl apply -f k8s/deployment.yaml
+                kubectl apply -f k8s/service.yaml
+                kubectl apply -f k8s/ingress.yaml
+                kubectl apply -f k8s/hpa.yaml
+                '''
             }
         }
-        stage('Install Monitoring Tools') {
+
+        stage('Add Helm Repos') {
             steps {
-                sh 'helm install prometheus prometheus-community/prometheus'
-                sh 'helm install grafana grafana/grafana'
+                sh '''
+                helm repo add stable https://charts.helm.sh/stable
+                helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+                helm repo update
+                '''
             }
+        }
+
+        stage('Install Prometheus Stack with Grafana') {
+            steps {
+                sh '''
+                kubectl create namespace prometheus || true
+
+                helm upgrade --install stable prometheus-community/kube-prometheus-stack \
+                    --namespace prometheus
+
+                echo "Waiting for Prometheus and Grafana pods to be ready..."
+                kubectl rollout status deployment stable-kube-prometheus-sta-grafana -n prometheus --timeout=120s
+                '''
+            }
+        }
+
+        stage('Expose Prometheus & Grafana via LoadBalancers') {
+            steps {
+                sh '''
+                # Change Prometheus svc to LoadBalancer
+                kubectl patch svc stable-kube-prometheus-sta-prometheus \
+                  -n prometheus \
+                  -p '{"spec": {"type": "LoadBalancer"}}'
+
+                # Change Grafana svc to LoadBalancer
+                kubectl patch svc stable-grafana \
+                  -n prometheus \
+                  -p '{"spec": {"type": "LoadBalancer"}}'
+                '''
+            }
+        }
+
+        stage('Show Prometheus & Grafana Endpoints + Password') {
+            steps {
+                sh '''
+                echo "External Prometheus Endpoint:"
+                kubectl get svc stable-kube-prometheus-sta-prometheus -n prometheus
+
+                echo "External Grafana Endpoint:"
+                kubectl get svc stable-grafana -n prometheus
+
+                echo "Grafana Admin Password:"
+                kubectl get secret --namespace prometheus stable-grafana \
+                  -o jsonpath="{.data.admin-password}" | base64 --decode ; echo
+
+                echo "Username: admin"
+                '''
+            }
+        }
+
+        stage('Verify Monitoring Dashboard Access') {
+            steps {
+                sh 'kubectl get pods -n prometheus'
+            }
+        }
+
+    }
+
+    post {
+        success {
+            echo "All deployments and monitoring setup completed successfully!"
+        }
+        failure {
+            echo "Something failed. Check the logs above."
         }
     }
 }
