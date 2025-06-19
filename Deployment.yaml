@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: busapp
+  name: busapp-deployment
 spec:
   replicas: 2
   selector:
@@ -13,7 +13,14 @@ spec:
         app: busapp
     spec:
       containers:
-        - name: busapp
-          image: learnitguide/busapp
-          ports:
-            - containerPort: 8080
+      - name: busapp
+        image: learnitguide/busapp
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "256Mi"
+          requests:
+            cpu: "200m"
+            memory: "128Mi"
