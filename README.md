@@ -59,7 +59,10 @@ End Result: A highly available, auto-scalable, and monitored application with a 
 ![Screenshot (579)](https://github.com/user-attachments/assets/2428aa86-8bdb-43f9-88fb-5d6931d05f19)
 
 
-![Screenshot (581)](https://github.com/user-attachments/assets/75357a99-7ee8-45db-88c0-c6140a846df2)
+![Screenshot (581)![![Screen![Screenshot (577)](https://github.com/user-attachments/assets/ad6f1d03-0d51-4872-b827-ac86390c3071)
+shot (576)](https://github.com/user-attachments/assets/a4949616-6c62-4b62-bd55-61e8d132a587)
+Screenshot (575)](https://github.com/user-attachments/assets/8104d158-34cc-4528-b354-1eed06732d6c)
+](https://github.com/user-attachments/assets/75357a99-7ee8-45db-88c0-c6140a846df2)
 ![Screenshot (583)](https://github.com/user-attachments/assets/b5dbae98-cc6b-475c-9b35-1ab41d0c54eb)
 ![Screenshot (584)](https://github.com/user-attachments/assets/8c8c1735-5298-41b3-a784-5a6d964795ef)
 ![Screenshot (589)](https://github.com/user-attachments/assets/4a5e52b2-7968-4f67-b448-0621ffb970b3)
